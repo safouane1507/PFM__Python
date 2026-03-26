@@ -1,6 +1,8 @@
+# faculty/views.py
 from django.shortcuts import render
 from django.http import HttpResponse
 
 # Create your views here.
 def index(request):
-    return HttpResponse("First test")
+    # return HttpResponse('First test')  <- l'ancienne version
+    return render(request, 'Home/index.html')
