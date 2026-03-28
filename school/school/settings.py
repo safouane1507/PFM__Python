@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'faculty', #app faculty
     'student', #app stident
+    'home_auth', #app home_auth
 ]
 
 MIDDLEWARE = [
@@ -118,6 +119,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+
+AUTH_USER_MODEL = 'home_auth.CustomUser' 
+AUTHENTICATION_BACKENDS = ( 
+    'django.contrib.auth.backends.ModelBackend', # Backend par défaut 
+    ) 
+LOGIN_URL = '/authentication/login/' 
+LOGIN_REDIRECT_URL = '/dashboard/'
