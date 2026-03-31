@@ -17,3 +17,26 @@ class Teacher(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+    
+#classeDepartement    
+    
+class Department(models.Model):
+    name = models.CharField(max_length=100, unique=True, verbose_name="Nom du département")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    head_teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='headed_departments',
+        verbose_name="Responsable (Enseignant)"
+    )
+    teachers = models.ManyToManyField(
+        Teacher,
+        blank=True,
+        related_name='departments',
+        verbose_name="Enseignants"
+    )
+
+    def __str__(self):
+        return self.name

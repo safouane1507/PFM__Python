@@ -1,7 +1,7 @@
 # faculty/views.py
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
-from .models import Teacher
+from .models import Teacher, Department 
 #from django.http import HttpResponse
 
 # Create your views here.
@@ -106,3 +106,62 @@ def view_teacher(request, teacher_id):
     
     # 2. On envoie les données à la page de profil
     return render(request, 'teachers/teacher-details.html', {'teacher': teacher})
+
+# Liste des départements
+def department_list(request):
+    departments = Department.objects.all()
+    return render(request, 'departments/departments.html', {'departments': departments})
+
+# Ajouter un département 
+def add_department(request):
+    teachers = Teacher.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        head_teacher_id = request.POST.get('head_teacher')
+        teacher_ids = request.POST.getlist('teachers')
+
+        head_teacher = Teacher.objects.get(id=head_teacher_id) if head_teacher_id else None
+
+        department = Department.objects.create(
+            name=name,
+            description=description,
+            head_teacher=head_teacher
+        )
+        department.teachers.set(teacher_ids)
+        department.save()
+
+        messages.success(request, 'Département ajouté avec succès !')
+        return redirect('department_list')
+
+    return render(request, 'departments/add-department.html', {'teachers': teachers})
+
+#Modifier un département
+def edit_department(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    teachers = Teacher.objects.all()
+
+    if request.method == 'POST':
+        department.name = request.POST.get('name')
+        department.description = request.POST.get('description')
+        head_teacher_id = request.POST.get('head_teacher')
+        teacher_ids = request.POST.getlist('teachers')
+
+        department.head_teacher = Teacher.objects.get(id=head_teacher_id) if head_teacher_id else None
+        department.teachers.set(teacher_ids)
+        department.save()
+
+        messages.success(request, 'Département mis à jour avec succès !')
+        return redirect('department_list')
+
+    return render(request, 'departments/edit-department.html', {
+        'department': department,
+        'teachers': teachers
+    })
+
+# Supprimer un département
+def delete_department(request, pk):
+    department = get_object_or_404(Department, pk=pk)
+    department.delete()
+    messages.success(request, 'Département supprimé avec succès !')
+    return redirect('department_list')
