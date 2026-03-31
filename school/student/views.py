@@ -4,7 +4,8 @@ from .models import Student, Parent
 
 # --- La fonction disparue est de retour ! ---
 def student_list(request):
-    return render(request, 'students/students.html')
+    students = Student.objects.all()
+    return render(request, 'students/students.html',{'student_list': students})
 
 # --- La grosse fonction d'ajout ---
 def add_student(request):
@@ -73,10 +74,48 @@ def add_student(request):
 
 # --- Les autres fonctions CRUD ---
 def edit_student(request, student_id):
-    return render(request, 'students/edit-student.html')
+    student = Student.objects.get(student_id=student_id)
+    parent = student.parent
+
+    if request.method == 'POST':
+        student.first_name = request.POST.get('first_name')
+        student.last_name = request.POST.get('last_name')
+        student.gender = request.POST.get('gender')
+        student.date_of_birth = request.POST.get('date_of_birth')
+        student.student_class = request.POST.get('student_class')
+        student.joining_date = request.POST.get('joining_date')
+        student.mobile_number = request.POST.get('mobile_number')
+        student.admission_number = request.POST.get('admission_number')
+        student.section = request.POST.get('section')
+        if request.FILES.get('student_image'):
+            student.student_image = request.FILES.get('student_image')
+        student.save()
+
+        parent.father_name = request.POST.get('father_name')
+        parent.father_occupation = request.POST.get('father_occupation')
+        parent.father_mobile = request.POST.get('father_mobile')
+        parent.father_email = request.POST.get('father_email')
+        parent.mother_name = request.POST.get('mother_name')
+        parent.mother_occupation = request.POST.get('mother_occupation')
+        parent.mother_mobile = request.POST.get('mother_mobile')
+        parent.mother_email = request.POST.get('mother_email')
+        parent.present_address = request.POST.get('present_address')
+        parent.permanent_address = request.POST.get('permanent_address')
+        parent.save()
+
+        messages.success(request, 'Student updated successfully')
+        return redirect('student_list')
+    
+    return render(request, 'students/edit-student.html', {'student': student, 'parent': parent})
+
 
 def view_student(request, student_id):
-    return render(request, 'students/student-details.html')
+    student = Student.objects.get(student_id=student_id)
+    return render(request, 'students/student-details.html', {'student': student})
 
 def delete_student(request, student_id):
+    student = Student.objects.get(student_id=student_id)
+    student.parent.delete()  # supprime aussi le parent (CASCADE)
+    student.delete()
+    messages.success(request, 'Student deleted successfully')
     return redirect('student_list')
