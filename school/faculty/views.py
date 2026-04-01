@@ -32,6 +32,12 @@ def add_teacher(request):
     if request.method == 'POST':
         # 1. On récupère toutes les données tapées dans les champs 'name' du HTML
         teacher_id = request.POST.get('teacher_id')
+        
+        # Vérification si cet ID existe déjà pour éviter l'erreur d'intégrité (UNIQUE constraint failed)
+        if Teacher.objects.filter(teacher_id=teacher_id).exists():
+            messages.error(request, f"Un enseignant avec l'ID '{teacher_id}' existe déjà. Veuillez utiliser un identifiant unique.")
+            return redirect('add_teacher')
+            
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         gender = request.POST.get('gender')

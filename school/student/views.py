@@ -84,7 +84,10 @@ def add_student(request):
 # --- Les autres fonctions CRUD ---
 @user_passes_test(is_admin)
 def edit_student(request, student_id):
-    student = Student.objects.get(student_id=student_id)
+    student = Student.objects.filter(student_id=student_id).first()
+    if not student:
+        messages.error(request, 'Student not found')
+        return redirect('student_list')
     parent = student.parent
 
     if request.method == 'POST':
@@ -120,13 +123,24 @@ def edit_student(request, student_id):
 
 
 def view_student(request, student_id):
-    student = Student.objects.get(student_id=student_id)
+    student = Student.objects.filter(student_id=student_id).first()
+    if not student:
+        messages.error(request, 'Student not found')
+        return redirect('student_list')
     return render(request, 'students/student-details.html', {'student': student})
 
 @user_passes_test(is_admin)
 def delete_student(request, student_id):
-    student = Student.objects.get(student_id=student_id)
-    student.parent.delete()  # supprime aussi le parent (CASCADE)
-    student.delete()
+    student = Student.objects.filter(student_id=student_id).first()
+    if not student:
+        messages.error(request, 'Student not found')
+        return redirect('student_list')
+    
+    # Supprimer le parent supprime aussi l'étudiant grâce au "on_delete=models.CASCADE"
+    if hasattr(student, 'parent') and student.parent:
+        student.parent.delete()
+    else:
+        student.delete()
+        
     messages.success(request, 'Student deleted successfully')
     return redirect('student_list')
