@@ -30,7 +30,7 @@ def signup_view(request):
         login(request, user) 
         messages.success(request, 'Signup successful!') 
         return redirect('index') 
-    return render(request, 'authentication/register.html')
+    return render(request, 'authentification/register.html')
 
 def login_view(request): 
     if request.method == 'POST': 
@@ -43,9 +43,9 @@ def login_view(request):
             messages.success(request, 'Login successful!') 
             # Redirection selon le rôle 
             if user.is_admin: 
-                return redirect('admin_dashboard') 
+                return redirect('dashboard') 
             elif user.is_teacher: 
-                return redirect('teacher_dashboard') 
+                return redirect('dashboard') 
             elif user.is_student:
                 return redirect('dashboard')
             else:
@@ -53,7 +53,7 @@ def login_view(request):
                 return redirect('index')
         else:
             messages.error(request, 'Invalid credentials') 
-            return render(request, 'authentication/login.html')
+            return render(request, 'authentification/login.html')
 def logout_view(request): 
     logout(request) 
     messages.success(request, 'You have been logged out.') 

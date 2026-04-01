@@ -70,3 +70,16 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.name
+    
+#jour feries (holidays)
+class Holiday(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Nom du jour férié")
+    date = models.DateField(verbose_name="Date")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+
+    class Meta:
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.name} ({self.date})"
+    

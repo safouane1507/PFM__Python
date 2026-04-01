@@ -1,7 +1,7 @@
 # faculty/views.py
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
-from .models import Teacher, Department, Subject
+from .models import Teacher, Department, Subject, Holiday
 #from django.http import HttpResponse
 
 # Create your views here.
@@ -223,3 +223,28 @@ def delete_subject(request, pk):
     subject.delete()
     messages.success(request, 'Matière supprimée !')
     return redirect('subject_list')
+
+# --- Holidays ---
+def holiday_list(request):
+    holidays = Holiday.objects.all()
+    return render(request, 'holidays/holidays.html', {'holidays': holidays})
+
+def add_holiday(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        date = request.POST.get('date')
+        description = request.POST.get('description')
+        Holiday.objects.create(name=name, date=date, description=description)
+        messages.success(request, 'Jour férié ajouté avec succès !')
+        return redirect('holiday_list')
+    return render(request, 'holidays/add-holiday.html')
+
+def delete_holiday(request, pk):
+    holiday = get_object_or_404(Holiday, pk=pk)
+    holiday.delete()
+    messages.success(request, 'Jour férié supprimé !')
+    return redirect('holiday_list')
+
+# --- Time Table ---
+def timetable(request):
+    return render(request, 'timetable/timetable.html')

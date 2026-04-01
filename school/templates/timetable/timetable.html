@@ -1,0 +1,49 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+{% block body %}
+<div class="page-wrapper">
+  <div class="content container-fluid">
+    <div class="page-header">
+      <div class="row align-items-center">
+        <div class="col">
+          <h3 class="page-title">Emploi du Temps</h3>
+          <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active">Emploi du Temps</li>
+          </ul>
+        </div>
+        <div class="col-auto text-right float-right ml-auto">
+          <a href="https://www.visual-timetabling.be/" target="_blank" class="btn btn-outline-primary">
+            <i class="fas fa-external-link-alt"></i> Ouvrir Visual Timetabling
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Visual Timetabling — Intégration en ligne</h5>
+            <p class="text-muted mb-0">
+              Créez votre emploi du temps directement sur 
+              <a href="https://www.visual-timetabling.be/" target="_blank">visual-timetabling.be</a>
+            </p>
+          </div>
+          <div class="card-body p-0">
+            <iframe
+              src="https://www.visual-timetabling.be/"
+              width="100%"
+              height="750px"
+              frameborder="0"
+              style="border: none; border-radius: 0 0 4px 4px;"
+              title="Visual Timetabling">
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
