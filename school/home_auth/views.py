@@ -33,28 +33,33 @@ def signup_view(request):
         return redirect('index') 
     return render(request, 'authentification/register.html')
 
-def login_view(request): 
-    if request.method == 'POST': 
-        email = request.POST['email'] 
-        password = request.POST['password']
-        user = authenticate(request, username=email, 
-                            password=password)
+    def login_view(request): 
+        if request.method == 'POST': 
+            email = request.POST.get('email') 
+            password = request.POST.get('password')
+            user = authenticate(request, username=email, password=password)
+            
         if user is not None:
             login(request, user)
-            messages.success(request, 'Login successful!') 
-            # Redirection selon le rôle 
-            if user.is_admin: 
+            messages.success(request, 'Connexion réussie !') 
+            
+            if getattr(user, 'is_admin', False): 
                 return redirect('dashboard') 
-            elif user.is_teacher: 
+            elif getattr(user, 'is_teacher', False): 
                 return redirect('dashboard') 
-            elif user.is_student:
+            elif getattr(user, 'is_student', False):
                 return redirect('dashboard')
             else:
-                messages.error(request, 'Invalid user role') 
+                messages.error(request, 'Rôle utilisateur invalide') 
                 return redirect('index')
         else:
-            messages.error(request, 'Invalid credentials') 
-            return render(request, 'authentification/login.html')
+            messages.error(request, 'Identifiants invalides') 
+
+    return render(request, 'authentification/login.html')
+
+        
+
+
 def logout_view(request): 
     logout(request) 
     messages.success(request, 'You have been logged out.') 

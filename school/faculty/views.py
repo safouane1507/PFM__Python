@@ -3,9 +3,15 @@ from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
 from .models import Teacher, Department, Subject, Holiday, Exam, ExamResult
 from student.models import Student
+from django.contrib.auth.decorators import login_required, user_passes_test
 #from django.http import HttpResponse
 
 # Create your views here.
+def is_admin(user):
+    return user.is_authenticated and getattr(user, 'is_admin', False)
+def is_teacher_or_admin(user):
+    return user.is_authenticated and (getattr(user, 'is_teacher', False) or getattr(user, 'is_admin', False))
+
 def index(request):
     # return HttpResponse('First test')  <- l'ancienne version
     #return render(request, 'Home/index.html')
@@ -20,6 +26,7 @@ def teacher_list(request):
     # 2. On les envoie (contexte) à un template HTML qu'on créera juste après
     return render(request, 'teachers/teachers.html', {'teachers': teachers})
 
+@user_passes_test(is_admin)
 def add_teacher(request):
     # Si le formulaire a été soumis (clic sur le bouton Enregistrer)
     if request.method == 'POST':
@@ -60,6 +67,7 @@ def add_teacher(request):
     # Si ce n'est pas un POST (ex: on vient juste d'ouvrir la page), on affiche le HTML
     return render(request, 'teachers/add-teacher.html')
 
+@user_passes_test(is_admin)
 def delete_teacher(request, teacher_id):
     # 1. On récupère le prof
     teacher = get_object_or_404(Teacher, teacher_id=teacher_id)
@@ -71,7 +79,8 @@ def delete_teacher(request, teacher_id):
     messages.success(request, 'Enseignant supprimé avec succès !')
     return redirect('teacher_list')
 
-# --- VUE : Modifier un enseignant ---
+
+@user_passes_test(is_admin)
 def edit_teacher(request, teacher_id):
     # 1. On récupère le prof spécifique grâce à son ID
     teacher = get_object_or_404(Teacher, teacher_id=teacher_id)
@@ -114,6 +123,7 @@ def department_list(request):
     return render(request, 'departments/departments.html', {'departments': departments})
 
 # Ajouter un département 
+@user_passes_test(is_admin)
 def add_department(request):
     teachers = Teacher.objects.all()
     if request.method == 'POST':
@@ -138,6 +148,7 @@ def add_department(request):
     return render(request, 'departments/add-department.html', {'teachers': teachers})
 
 #Modifier un département
+@user_passes_test(is_admin)
 def edit_department(request, pk):
     department = get_object_or_404(Department, pk=pk)
     teachers = Teacher.objects.all()
@@ -161,6 +172,7 @@ def edit_department(request, pk):
     })
 
 # Supprimer un département
+@user_passes_test(is_admin)
 def delete_department(request, pk):
     department = get_object_or_404(Department, pk=pk)
     department.delete()
@@ -172,6 +184,7 @@ def subject_list(request):
     subjects = Subject.objects.select_related('department', 'teacher').all()
     return render(request, 'subjects/subjects.html', {'subjects': subjects})
 
+@user_passes_test(is_admin)
 def add_subject(request):
     departments = Department.objects.all()
     teachers = Teacher.objects.all()
@@ -197,6 +210,7 @@ def add_subject(request):
         'teachers': teachers
     })
 
+@user_passes_test(is_admin)
 def edit_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     departments = Department.objects.all()
@@ -219,6 +233,7 @@ def edit_subject(request, pk):
         'teachers': teachers
     })
 
+@user_passes_test(is_admin)
 def delete_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     subject.delete()
@@ -230,6 +245,7 @@ def holiday_list(request):
     holidays = Holiday.objects.all()
     return render(request, 'holidays/holidays.html', {'holidays': holidays})
 
+@user_passes_test(is_admin)
 def add_holiday(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -240,6 +256,7 @@ def add_holiday(request):
         return redirect('holiday_list')
     return render(request, 'holidays/add-holiday.html')
 
+@user_passes_test(is_admin)
 def delete_holiday(request, pk):
     holiday = get_object_or_404(Holiday, pk=pk)
     holiday.delete()
@@ -256,6 +273,7 @@ def exam_list(request):
     exams = Exam.objects.select_related('subject').all()
     return render(request, 'exams/exam_list.html', {'exams': exams})
 
+@user_passes_test(is_teacher_or_admin)
 def add_exam(request):
     subjects = Subject.objects.all()
     if request.method == 'POST':
@@ -282,6 +300,7 @@ def result_list(request):
     results = ExamResult.objects.select_related('exam', 'student').all()
     return render(request, 'exams/result_list.html', {'results': results})
 
+@user_passes_test(is_teacher_or_admin)
 def add_result(request):
     exams = Exam.objects.all()
     students = Student.objects.all()
