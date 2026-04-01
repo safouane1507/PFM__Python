@@ -40,3 +40,33 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Ligne 44 et suivantes — après class Department
+class Subject(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Nom de la matière")
+    code = models.CharField(max_length=20, unique=True, verbose_name="Code")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    
+    # Lien avec Department (une matière appartient à un département)
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subjects',
+        verbose_name="Département"
+    )
+    
+    # Lien avec Teacher (un enseignant enseigne cette matière)
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subjects',
+        verbose_name="Enseignant"
+    )
+
+    def __str__(self):
+        return self.name

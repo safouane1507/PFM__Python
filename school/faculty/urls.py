@@ -15,4 +15,15 @@ urlpatterns = [
     path('departments/add/', views.add_department, name='add_department'),
     path('departments/edit/<int:pk>/', views.edit_department, name='edit_department'),
     path('departments/delete/<int:pk>/', views.delete_department, name='delete_department'),
+
+        #matières
+    path('subjects/', views.subject_list, name='subject_list'),
+    path('subjects/add/', views.add_subject, name='add_subject'),
+    path('subjects/edit/<int:pk>/', views.edit_subject, name='edit_subject'),
+    path('subjects/delete/<int:pk>/', views.delete_subject, name='delete_subject'),
+
+
+
+
+
 ]

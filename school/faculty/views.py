@@ -1,7 +1,7 @@
 # faculty/views.py
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
-from .models import Teacher, Department 
+from .models import Teacher, Department, Subject
 #from django.http import HttpResponse
 
 # Create your views here.
@@ -165,3 +165,61 @@ def delete_department(request, pk):
     department.delete()
     messages.success(request, 'Département supprimé avec succès !')
     return redirect('department_list')
+# ─── MATIÈRES ───────────────────────────────────────
+
+def subject_list(request):
+    subjects = Subject.objects.select_related('department', 'teacher').all()
+    return render(request, 'subjects/subjects.html', {'subjects': subjects})
+
+def add_subject(request):
+    departments = Department.objects.all()
+    teachers = Teacher.objects.all()
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        code = request.POST.get('code')
+        description = request.POST.get('description')
+        department_id = request.POST.get('department')
+        teacher_id = request.POST.get('teacher')
+
+        Subject.objects.create(
+            name=name,
+            code=code,
+            description=description,
+            department=Department.objects.get(id=department_id) if department_id else None,
+            teacher=Teacher.objects.get(id=teacher_id) if teacher_id else None,
+        )
+        messages.success(request, 'Matière ajoutée avec succès !')
+        return redirect('subject_list')
+
+    return render(request, 'subjects/add-subject.html', {
+        'departments': departments,
+        'teachers': teachers
+    })
+
+def edit_subject(request, pk):
+    subject = get_object_or_404(Subject, pk=pk)
+    departments = Department.objects.all()
+    teachers = Teacher.objects.all()
+    if request.method == 'POST':
+        subject.name = request.POST.get('name')
+        subject.code = request.POST.get('code')
+        subject.description = request.POST.get('description')
+        dep_id = request.POST.get('department')
+        tea_id = request.POST.get('teacher')
+        subject.department = Department.objects.get(id=dep_id) if dep_id else None
+        subject.teacher = Teacher.objects.get(id=tea_id) if tea_id else None
+        subject.save()
+        messages.success(request, 'Matière mise à jour !')
+        return redirect('subject_list')
+
+    return render(request, 'subjects/edit-subject.html', {
+        'subject': subject,
+        'departments': departments,
+        'teachers': teachers
+    })
+
+def delete_subject(request, pk):
+    subject = get_object_or_404(Subject, pk=pk)
+    subject.delete()
+    messages.success(request, 'Matière supprimée !')
+    return redirect('subject_list')
