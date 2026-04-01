@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib import messages 
 from .models import CustomUser
+from .models import PasswordResetRequest
 
 def signup_view(request):
     if request.method == 'POST':
@@ -60,4 +61,15 @@ def logout_view(request):
     return redirect('index')
 
 def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = CustomUser.objects.get(email=email)
+            reset_req = PasswordResetRequest.objects.create(user=user, email=email)
+            reset_req.send_reset_email() 
+            messages.success(request, 'Un lien de réinitialisation a été envoyé à votre email (visitez votre console terminal si vous êtes en local).')
+            return redirect('login')
+        except CustomUser.DoesNotExist:
+            messages.error(request, 'Aucun compte associé à cet email.')
+            return redirect('forgot-password')
     return render(request, 'authentification/forgot-password.html')

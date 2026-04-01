@@ -1,13 +1,22 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Student, Parent
+from django.contrib.auth.decorators import login_required, user_passes_test
 
-# --- La fonction disparue est de retour ! ---
+
+
+def is_admin(user):
+    return user.is_authenticated and getattr(user, 'is_admin', False)
+
+def is_teacher_or_admin(user):
+    return user.is_authenticated and (getattr(user, 'is_teacher', False) or getattr(user, 'is_admin', False))
+
+
 def student_list(request):
     students = Student.objects.all()
     return render(request, 'students/students.html',{'student_list': students})
 
-# --- La grosse fonction d'ajout ---
+@user_passes_test(is_admin)
 def add_student(request):
     if request.method == 'POST':
         # Récupérer les données de l'étudiant
@@ -73,6 +82,7 @@ def add_student(request):
         return render(request, 'students/add-student.html')
 
 # --- Les autres fonctions CRUD ---
+@user_passes_test(is_admin)
 def edit_student(request, student_id):
     student = Student.objects.get(student_id=student_id)
     parent = student.parent
@@ -113,6 +123,7 @@ def view_student(request, student_id):
     student = Student.objects.get(student_id=student_id)
     return render(request, 'students/student-details.html', {'student': student})
 
+@user_passes_test(is_admin)
 def delete_student(request, student_id):
     student = Student.objects.get(student_id=student_id)
     student.parent.delete()  # supprime aussi le parent (CASCADE)
