@@ -158,9 +158,17 @@
                      <li>
                         <a href="fees.html"><i class="fas fa-comment-dollar"></i> <span>Fees</span></a>
                      </li>
-                     <li>
-                        <a href="exam.html"><i class="fas fa-clipboard-list"></i> <span>Exam list</span></a>
+                     
+                     <!-- 👇 NOUVEAU MENU EXAMENS (Remplace l'ancien "exam.html") 👇 -->
+                     <li class="submenu">
+                        <a href="#"><i class="fas fa-clipboard-list"></i> <span> Examens </span> <span class="menu-arrow"></span></a>
+                        <ul>
+                           <li><a href="{% url 'exam_list' %}">Planification</a></li>
+                           <li><a href="{% url 'result_list' %}">Résultats (Notes)</a></li>
+                        </ul>
                      </li>
+                     <!-- 👆 FIN DU NOUVEAU MENU EXAMENS 👆 -->
+
                      <li>
                         <a href="event.html"><i class="fas fa-calendar-day"></i> <span>Events</span></a>
                      </li>
@@ -326,4 +334,3 @@
       
   </body>
   </html>
-  

@@ -83,3 +83,25 @@ class Holiday(models.Model):
     def __str__(self):
         return f"{self.name} ({self.date})"
     
+# ─── EXAMENS & RÉSULTATS ────────────────────────────────
+
+class Exam(models.Model):
+    exam_name = models.CharField(max_length=100, verbose_name="Nom de l'examen (ex: Contrôle Continu 1)")
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name="Matière")
+    exam_date = models.DateField(verbose_name="Date de l'examen")
+    start_time = models.TimeField(verbose_name="Heure de début")
+    end_time = models.TimeField(verbose_name="Heure de fin")
+
+    def __str__(self):
+        return f"{self.exam_name} - {self.subject.name}"
+
+class ExamResult(models.Model):
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE, verbose_name="Examen")
+    # On utilise 'student.Student' sous forme de texte pour éviter les erreurs d'importation circulaires
+    student = models.ForeignKey('student.Student', on_delete=models.CASCADE, verbose_name="Étudiant")
+    marks_obtained = models.DecimalField(max_digits=5, decimal_places=2, verbose_name="Note obtenue")
+    total_marks = models.DecimalField(max_digits=5, decimal_places=2, default=20.00, verbose_name="Note sur (ex: 20)")
+    comments = models.TextField(blank=True, null=True, verbose_name="Appréciation")
+
+    def __str__(self):
+        return f"Résultat de {self.student.first_name} pour {self.exam.exam_name}"

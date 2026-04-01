@@ -30,6 +30,11 @@ urlpatterns = [
     # Timetable
     path('timetable/', views.timetable, name='timetable'),
 
+    # ─── Examens et Résultats ───
+    path('exams/', views.exam_list, name='exam_list'),
+    path('exams/add/', views.add_exam, name='add_exam'),
+    path('results/', views.result_list, name='result_list'),
+    path('results/add/', views.add_result, name='add_result'),
 
 
 

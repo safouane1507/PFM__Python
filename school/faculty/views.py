@@ -1,7 +1,8 @@
 # faculty/views.py
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
-from .models import Teacher, Department, Subject, Holiday
+from .models import Teacher, Department, Subject, Holiday, Exam, ExamResult
+from student.models import Student
 #from django.http import HttpResponse
 
 # Create your views here.
@@ -248,3 +249,56 @@ def delete_holiday(request, pk):
 # --- Time Table ---
 def timetable(request):
     return render(request, 'timetable/timetable.html')
+
+# ─── EXAMENS : Planification ───────────────────────────────────────
+
+def exam_list(request):
+    exams = Exam.objects.select_related('subject').all()
+    return render(request, 'exams/exam_list.html', {'exams': exams})
+
+def add_exam(request):
+    subjects = Subject.objects.all()
+    if request.method == 'POST':
+        exam_name = request.POST.get('exam_name')
+        subject_id = request.POST.get('subject')
+        exam_date = request.POST.get('exam_date')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+
+        Exam.objects.create(
+            exam_name=exam_name,
+            subject_id=subject_id, # Remarquez comment on utilise l'ID directement
+            exam_date=exam_date,
+            start_time=start_time,
+            end_time=end_time
+        )
+        messages.success(request, 'Examen planifié avec succès !')
+        return redirect('exam_list')
+    return render(request, 'exams/add_exam.html', {'subjects': subjects})
+
+# ─── RÉSULTATS : Saisie des notes ───────────────────────────────────
+
+def result_list(request):
+    results = ExamResult.objects.select_related('exam', 'student').all()
+    return render(request, 'exams/result_list.html', {'results': results})
+
+def add_result(request):
+    exams = Exam.objects.all()
+    students = Student.objects.all()
+    if request.method == 'POST':
+        exam_id = request.POST.get('exam')
+        student_id = request.POST.get('student')
+        marks = request.POST.get('marks')
+        total_marks = request.POST.get('total_marks', 20.00) # 20 par défaut si non fourni
+        comments = request.POST.get('comments')
+
+        ExamResult.objects.create(
+            exam_id=exam_id,
+            student_id=student_id,
+            marks_obtained=marks,
+            total_marks=total_marks,
+            comments=comments
+        )
+        messages.success(request, 'Résultat saisi avec succès !')
+        return redirect('result_list')
+    return render(request, 'exams/add_result.html', {'exams': exams, 'students': students})
