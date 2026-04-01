@@ -105,3 +105,25 @@ class ExamResult(models.Model):
 
     def __str__(self):
         return f"Résultat de {self.student.first_name} pour {self.exam.exam_name}"
+
+class Timetable(models.Model):
+    DAYS_OF_WEEK = [
+        (1, 'Lundi'),
+        (2, 'Mardi'),
+        (3, 'Mercredi'),
+        (4, 'Jeudi'),
+        (5, 'Vendredi'),
+        (6, 'Samedi'),
+    ]
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, verbose_name="Matière")
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, verbose_name="Enseignant")
+    day = models.IntegerField(choices=DAYS_OF_WEEK, verbose_name="Jour de la semaine")
+    start_time = models.TimeField(verbose_name="Heure de début")
+    end_time = models.TimeField(verbose_name="Heure de fin")
+    room = models.CharField(max_length=50, blank=True, null=True, verbose_name="Salle")
+
+    class Meta:
+        ordering = ['day', 'start_time']
+
+    def __str__(self):
+        return f"{self.get_day_display()} - {self.subject.name} ({self.start_time})"

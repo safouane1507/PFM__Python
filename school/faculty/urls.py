@@ -29,6 +29,8 @@ urlpatterns = [
 
     # Timetable
     path('timetable/', views.timetable, name='timetable'),
+    path('timetable/add/', views.add_timetable, name='add_timetable'),
+    path('timetable/delete/<int:pk>/', views.delete_timetable, name='delete_timetable'),
 
     # ─── Examens et Résultats ───
     path('exams/', views.exam_list, name='exam_list'),

@@ -79,7 +79,7 @@
                      <a class="dropdown-item" href="inbox.html">Inbox</a>
                      <a class="dropdown-item" href="">Logout</a>
                      -->
-                     <a class="dropdown-item" href="#">My Profile</a>
+                     <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
                      <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                   </div>
                </li>
@@ -182,6 +182,11 @@
  
 
     
+      <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
+      <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'assets/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+      <script src="{% static 'assets/js/script.js' %}"></script>
+ 
       <script type="text/javascript">
           document.addEventListener('DOMContentLoaded', function() {
               // Select the notification dropdown element

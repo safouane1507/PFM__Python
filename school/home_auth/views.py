@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout 
 from django.contrib import messages 
 from .models import CustomUser
@@ -11,6 +12,11 @@ def signup_view(request):
         email = request.POST['email'] 
         password = request.POST['password'] 
         role = request.POST.get('role') # student, teacher ou admin
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Cet email est déjà utilisé par un autre compte.")
+            return render(request, 'authentification/register.html')
+
 
         user = CustomUser.objects.create_user( 
             username=email, 
@@ -104,4 +110,30 @@ def reset_password(request, token):
         else:
             messages.error(request, 'Les mots de passe ne correspondent pas.')
 
-    return render(request, 'authentification/reset_password.html')
+    return render(request, 'authentification/reset_password.html')
+
+@login_required
+def profile_view(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+
+        # Simple validation
+        if not first_name or not last_name or not email:
+            messages.error(request, "Tous les champs sont obligatoires.")
+        else:
+            # Check if email is already taken by another user
+            if CustomUser.objects.filter(email=email).exclude(pk=request.user.pk).exists():
+                messages.error(request, "Cet email est déjà lié à un autre compte.")
+            else:
+                user = request.user
+                user.first_name = first_name
+                user.last_name = last_name
+                user.email = email
+                user.username = email # Synchronizing username with email as done in signup
+                user.save()
+                messages.success(request, "Profil mis à jour avec succès !")
+                return redirect('profile')
+
+    return render(request, 'authentification/profile.html')

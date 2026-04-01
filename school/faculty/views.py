@@ -1,7 +1,7 @@
 # faculty/views.py
 from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
-from .models import Teacher, Department, Subject, Holiday, Exam, ExamResult
+from .models import Teacher, Department, Subject, Holiday, Exam, ExamResult, Timetable
 from student.models import Student
 from django.contrib.auth.decorators import login_required, user_passes_test
 #from django.http import HttpResponse
@@ -265,7 +265,59 @@ def delete_holiday(request, pk):
 
 # --- Time Table ---
 def timetable(request):
-    return render(request, 'timetable/timetable.html')
+    entries = Timetable.objects.select_related('subject', 'teacher').all()
+    
+    # Organiser les données par jour pour faciliter l'affichage en grille
+    timetable_data = {i: [] for i in range(1, 7)}
+    for entry in entries:
+        timetable_data[entry.day].append(entry)
+        
+    context = {
+        'timetable_data': timetable_data,
+        'days_names': {
+            1: 'Lundi', 2: 'Mardi', 3: 'Mercredi', 
+            4: 'Jeudi', 5: 'Vendredi', 6: 'Samedi'
+        }
+    }
+    return render(request, 'timetable/timetable.html', context)
+
+@user_passes_test(is_teacher_or_admin)
+def add_timetable(request):
+    subjects = Subject.objects.all()
+    teachers = Teacher.objects.all()
+    days = Timetable.DAYS_OF_WEEK
+    
+    if request.method == 'POST':
+        subject_id = request.POST.get('subject')
+        teacher_id = request.POST.get('teacher')
+        day = request.POST.get('day')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        room = request.POST.get('room')
+
+        Timetable.objects.create(
+            subject_id=subject_id,
+            teacher_id=teacher_id,
+            day=day,
+            start_time=start_time,
+            end_time=end_time,
+            room=room
+        )
+        messages.success(request, 'Créneau ajouté avec succès !')
+        return redirect('timetable')
+
+    return render(request, 'timetable/add-timetable.html', {
+        'subjects': subjects,
+        'teachers': teachers,
+        'days': days
+    })
+
+@user_passes_test(is_teacher_or_admin)
+def delete_timetable(request, pk):
+    entry = get_object_or_404(Timetable, pk=pk)
+    entry.delete()
+    messages.success(request, 'Créneau supprimé avec succès !')
+    return redirect('timetable')
 
 # ─── EXAMENS : Planification ───────────────────────────────────────
 
