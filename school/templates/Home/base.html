@@ -95,7 +95,15 @@
                      <li class="submenu">
                         <a href="#"><i class="fas fa-tachometer-alt"></i> <span> Dashboard</span> <span class="menu-arrow"></span></a>
                         <ul>
+                           {% if request.user.is_admin %}
                            <li><a href="{% url 'dashboard' %}">Admin Dashboard</a></li>
+                           {% elif request.user.is_teacher %}
+                           <li><a href="{% url 'dashboard' %}">Teacher Dashboard</a></li>
+                           {% elif request.user.is_student %}
+                           <li><a href="{% url 'dashboard' %}">Student Dashboard</a></li>
+                           {% else %}
+                           <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                           {% endif %}
                         </ul>
                      </li>
 

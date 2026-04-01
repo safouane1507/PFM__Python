@@ -10,10 +10,20 @@
 <div class="page-header">
 <div class="row">
 <div class="col-sm-12">
-<h3 class="page-title">Welcome Bruklin!</h3>
+<h3 class="page-title">Welcome {{ request.user.first_name|default:request.user.username }}!</h3>
 <ul class="breadcrumb">
-<li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-<li class="breadcrumb-item active">Student Dashboard</li>
+<li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+<li class="breadcrumb-item active">
+{% if request.user.is_admin %}
+    Admin Dashboard
+{% elif request.user.is_teacher %}
+    Teacher Dashboard
+{% elif request.user.is_student %}
+    Student Dashboard
+{% else %}
+    Dashboard
+{% endif %}
+</li>
 </ul>
 </div>
 </div>

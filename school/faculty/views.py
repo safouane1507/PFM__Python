@@ -184,7 +184,7 @@ def subject_list(request):
     subjects = Subject.objects.select_related('department', 'teacher').all()
     return render(request, 'subjects/subjects.html', {'subjects': subjects})
 
-@user_passes_test(is_admin)
+@user_passes_test(is_teacher_or_admin)
 def add_subject(request):
     departments = Department.objects.all()
     teachers = Teacher.objects.all()
@@ -210,7 +210,7 @@ def add_subject(request):
         'teachers': teachers
     })
 
-@user_passes_test(is_admin)
+@user_passes_test(is_teacher_or_admin)
 def edit_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     departments = Department.objects.all()
@@ -233,7 +233,7 @@ def edit_subject(request, pk):
         'teachers': teachers
     })
 
-@user_passes_test(is_admin)
+@user_passes_test(is_teacher_or_admin)
 def delete_subject(request, pk):
     subject = get_object_or_404(Subject, pk=pk)
     subject.delete()

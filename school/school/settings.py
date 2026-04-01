@@ -132,3 +132,7 @@ AUTHENTICATION_BACKENDS = (
     ) 
 LOGIN_URL = '/authentication/login/' 
 LOGIN_REDIRECT_URL = '/dashboard/'
+
+# Email settings for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

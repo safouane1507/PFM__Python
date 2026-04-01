@@ -33,12 +33,12 @@ def signup_view(request):
         return redirect('index') 
     return render(request, 'authentification/register.html')
 
-    def login_view(request): 
-        if request.method == 'POST': 
-            email = request.POST.get('email') 
-            password = request.POST.get('password')
-            user = authenticate(request, username=email, password=password)
-            
+def login_view(request): 
+    if request.method == 'POST': 
+        email = request.POST.get('email') 
+        password = request.POST.get('password')
+        user = authenticate(request, username=email, password=password)
+        
         if user is not None:
             login(request, user)
             messages.success(request, 'Connexion réussie !') 
@@ -57,7 +57,7 @@ def signup_view(request):
 
     return render(request, 'authentification/login.html')
 
-        
+
 
 
 def logout_view(request): 
@@ -78,3 +78,30 @@ def forgot_password(request):
             messages.error(request, 'Aucun compte associé à cet email.')
             return redirect('forgot-password')
     return render(request, 'authentification/forgot-password.html')
+
+def reset_password(request, token):
+    try:
+        reset_req = PasswordResetRequest.objects.get(token=token)
+    except PasswordResetRequest.DoesNotExist:
+        messages.error(request, 'Ce lien de réinitialisation est invalide.')
+        return redirect('forgot-password')
+        
+    if not reset_req.is_valid():
+        messages.error(request, 'Ce lien de réinitialisation a expiré.')
+        return redirect('forgot-password')
+
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if new_password and new_password == confirm_password:
+            user = reset_req.user
+            user.set_password(new_password)
+            user.save()
+            reset_req.delete() 
+            messages.success(request, 'Votre mot de passe a été réinitialisé ! Connectez-vous.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Les mots de passe ne correspondent pas.')
+
+    return render(request, 'authentification/reset_password.html')
