@@ -1,11 +1,19 @@
- ══════════════════════════════════════════════════════════════
-     🎬  DEMO VIDEO 
-     ══════════════════════════════════════════════════════════════
+# Rapport de Projet de Fin de Module : Application Web de Gestion Scolaire "PreSkool"
+> - **Encadré par : 	Pr. AHSAIN Sara**
+> - **Préparé par :**
+> - **Mohamed Reda Benmoussa**
+> - **Safouane Bousakhra**
 
+ ════════════════════════════════════════════════════════════════════════════════════════
+
+
+     
+ 🎬  DEMO VIDEO 
+ 
 https://github.com/user-attachments/assets/3967b1ad-70b5-40f2-9907-499c37a7f166
 
 
-═══════════════════════════════════════════════════════════════
+═════════════════════════════════════════════════════════════════════════════════════════
 
 <div align="center">
 
