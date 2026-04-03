@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect , get_object_or_404
 from django.contrib import messages
 from .models import Teacher, Department, Subject, Holiday, Exam, ExamResult, Timetable
 from student.models import Student
+from messaging.models import Announcement, Message
 from django.contrib.auth.decorators import login_required, user_passes_test
 #from django.http import HttpResponse
 
@@ -16,8 +17,19 @@ def index(request):
     # return HttpResponse('First test')  <- l'ancienne version
     #return render(request, 'Home/index.html')
     return render(request, 'authentification/login.html')
+@login_required
 def dashboard(request):
-    return render (request, 'students/student-dashboard.html')
+    # Statistiques basiques (à afficher dans les cartes du haut)
+    context = {
+        'total_students': Student.objects.count(),
+        'total_teachers': Teacher.objects.count(),
+        'total_subjects': Subject.objects.count(),
+        'total_exams': Exam.objects.count(),
+        'recent_announcements': Announcement.objects.all().order_by('-created_at')[:4],
+        'timetables': Timetable.objects.all().order_by('day', 'start_time'),
+        'unread_messages': Message.objects.filter(recipient=request.user, is_read=False).order_by('-created_at')[:5]
+    }
+    return render(request, 'students/student-dashboard.html', context)
 
 def teacher_list(request):
     # 1. On récupère tous les enseignants de la base de données
