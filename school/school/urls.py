@@ -24,4 +24,5 @@ urlpatterns = [
     path('', include('faculty.urls')),
     path('student/', include('student.urls')),
     path('authentification/', include('home_auth.urls')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('messaging/', include('messaging.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

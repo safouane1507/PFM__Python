@@ -247,6 +247,7 @@ def delete_subject(request, pk):
     return redirect('subject_list')
 
 # --- Holidays ---
+@login_required
 def holiday_list(request):
     holidays = Holiday.objects.all()
     return render(request, 'holidays/holidays.html', {'holidays': holidays})
@@ -327,6 +328,7 @@ def delete_timetable(request, pk):
 
 # ─── EXAMENS : Planification ───────────────────────────────────────
 
+@login_required
 def exam_list(request):
     exams = Exam.objects.select_related('subject').all()
     return render(request, 'exams/exam_list.html', {'exams': exams})
@@ -354,8 +356,16 @@ def add_exam(request):
 
 # ─── RÉSULTATS : Saisie des notes ───────────────────────────────────
 
+@login_required
 def result_list(request):
-    results = ExamResult.objects.select_related('exam', 'student').all()
+    # Si l'utilisateur est un étudiant, on filtre ses résultats par nom
+    if getattr(request.user, 'is_student', False):
+        results = ExamResult.objects.select_related('exam', 'student').filter(
+            student__first_name__iexact=request.user.first_name,
+            student__last_name__iexact=request.user.last_name
+        )
+    else:
+        results = ExamResult.objects.select_related('exam', 'student').all()
     return render(request, 'exams/result_list.html', {'results': results})
 
 @user_passes_test(is_teacher_or_admin)

@@ -1,0 +1,81 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="content container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="page-title">Nouveau message</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'inbox' %}">Messagerie</a></li>
+                        <li class="breadcrumb-item active">Composer</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Header -->
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">À :</label>
+                                        <div class="col-sm-10">
+                                            <select class="form-control" name="recipient" required>
+                                                <option value="">-- Sélectionnez un destinataire --</option>
+                                                {% for user in recipients %}
+                                                    <option value="{{ user.pk }}">
+                                                        {{ user.first_name }} {{ user.last_name }} 
+                                                        ({% if user.is_admin %}Admin{% elif user.is_teacher %}Professeur{% elif user.is_student %}Étudiant{% else %}Utilisateur{% endif %})
+                                                    </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Objet :</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" class="form-control" name="subject" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label">Message :</label>
+                                        <div class="col-sm-10">
+                                            <textarea rows="8" class="form-control" name="body" required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div class="text-right">
+                                        <a href="{% url 'inbox' %}" class="btn btn-link">Annuler</a>
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane mr-2"></i>Envoyer le message</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="content container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="page-title">Boîte de réception</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Messagerie</li>
+                    </ul>
+                </div>
+                <div class="col-auto text-right float-right ml-auto">
+                    <a href="{% url 'compose' %}" class="btn btn-primary"><i class="fas fa-plus"></i> Nouveau message</a>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Header -->
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header pb-0 border-bottom-0">
+                        <ul class="nav nav-tabs nav-tabs-bottom">
+                            <li class="nav-item"><a class="nav-link {% if active_tab == 'inbox' %}active{% endif %}" href="{% url 'inbox' %}">Reçus {% if unread_count > 0 %}<span class="badge badge-danger">{{ unread_count }}</span>{% endif %}</a></li>
+                            <li class="nav-item"><a class="nav-link {% if active_tab == 'sent' %}active{% endif %}" href="{% url 'sent_messages' %}">Envoyés</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>{% if active_tab == 'inbox' %}Expéditeur{% else %}Destinataire{% endif %}</th>
+                                        <th>Objet</th>
+                                        <th>Date</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for msg in messages_list %}
+                                        <tr class="{% if active_tab == 'inbox' and not msg.is_read %}font-weight-bold bg-light{% endif %}">
+                                            <td>
+                                                <h2 class="table-avatar">
+                                                    <a href="{% url 'message_detail' msg.pk %}" class="avatar avatar-sm mr-2">
+                                                        <img class="avatar-img rounded-circle" src="{% static 'assets/img/profiles/avatar-01.jpg' %}" alt="User Image">
+                                                    </a>
+                                                    <a href="{% url 'message_detail' msg.pk %}">{% if active_tab == 'inbox' %}{{ msg.sender.first_name }} {{ msg.sender.last_name }}{% else %}{{ msg.recipient.first_name }} {{ msg.recipient.last_name }}{% endif %} <span>{% if active_tab == 'inbox' %}@{{ msg.sender.username }}{% else %}@{{ msg.recipient.username }}{% endif %}</span></a>
+                                                </h2>
+                                            </td>
+                                            <td><a href="{% url 'message_detail' msg.pk %}" class="text-dark">{{ msg.subject }}</a></td>
+                                            <td>{{ msg.created_at|date:"d M Y H:i" }}</td>
+                                            <td class="text-right">
+                                                <a href="{% url 'message_detail' msg.pk %}" class="btn btn-sm bg-success-light mr-2">
+                                                    <i class="far fa-eye"></i>
+                                                </a>
+                                                <form action="{% url 'delete_message' msg.pk %}" method="POST" style="display:inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm bg-danger-light" onclick="return confirm('Supprimer ce message ?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                {% if active_tab == 'inbox' %}Aucun message reçu.{% else %}Aucun message envoyé.{% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

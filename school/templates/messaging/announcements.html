@@ -1,0 +1,115 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="content container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="page-title">Tableau d'affichage</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                        <li class="breadcrumb-item active">Annonces</li>
+                    </ul>
+                </div>
+                {% if not request.user.is_student %}
+                <div class="col-auto text-right float-right ml-auto">
+                    <a href="{% url 'create_announcement' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Publier une annonce
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- /Page Header -->
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            {% for ann in announcements %}
+                <div class="col-12 col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 {% if ann.is_important %}border-danger border shadow-sm{% else %}shadow-sm{% endif %}">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0 {% if ann.is_important %}text-danger font-weight-bold{% endif %}">
+                                {% if ann.is_important %}<i class="fas fa-exclamation-circle mr-1"></i>{% endif %}
+                                {{ ann.title }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text text-muted small mb-3">
+                                Par <span class="font-weight-bold text-dark">{{ ann.author.first_name }} {{ ann.author.last_name }}</span> 
+                                - {{ ann.created_at|date:"d M Y à H:i" }}
+                            </p>
+                            <p class="card-text" style="line-height: 1.5;">{{ ann.content|truncatechars:150|linebreaksbr }}</p>
+                            
+                            <!-- Modal Button -->
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-toggle="modal" data-target="#announcementModal{{ ann.pk }}">
+                                Lire la suite
+                            </button>
+                        </div>
+                        {% if request.user == ann.author or request.user.is_admin %}
+                        <div class="card-footer bg-white text-right border-top-0">
+                            <form action="{% url 'delete_announcement' ann.pk %}" method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm text-danger border-0 bg-transparent" onclick="return confirm('Supprimer cette annonce ?');">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Modal for full announcement -->
+                <div class="modal fade" id="announcementModal{{ ann.pk }}" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header {% if ann.is_important %}bg-danger text-white{% endif %}">
+                                <h5 class="modal-title">
+                                    {% if ann.is_important %}<i class="fas fa-exclamation-circle mr-2"></i>{% endif %}
+                                    {{ ann.title }}
+                                </h5>
+                                <button type="button" class="close {% if ann.is_important %}text-white{% endif %}" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                    <img class="avatar-img rounded-circle mr-3" src="{% static 'assets/img/profiles/avatar-01.jpg' %}" alt="User Image" width="40">
+                                    <div>
+                                        <p class="mb-0 font-weight-bold">{{ ann.author.first_name }} {{ ann.author.last_name }}</p>
+                                        <p class="mb-0 text-muted small">{{ ann.created_at|date:"d F Y à H:i" }}</p>
+                                    </div>
+                                </div>
+                                <div style="font-size: 1.1em; line-height: 1.6;">
+                                    {{ ann.content|linebreaks }}
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center py-4">
+                        <i class="fas fa-info-circle mr-2"></i>Aucune annonce n'a été publiée pour le moment.
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

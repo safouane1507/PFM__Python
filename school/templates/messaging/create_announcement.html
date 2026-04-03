@@ -1,0 +1,73 @@
+{% extends 'Home/base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="content container-fluid">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h3 class="page-title">Nouvelle annonce</h3>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'announcements' %}">Annonces</a></li>
+                        <li class="breadcrumb-item active">Ajouter</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Header -->
+
+        <div class="row">
+            <div class="col-sm-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
+                <div class="card">
+                    <div class="card-body">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Titre de l'annonce :</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" name="title" placeholder="Ex: Rattrapage, Informations d'inscription..." required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Contenu :</label>
+                                <div class="col-sm-9">
+                                    <textarea rows="8" class="form-control" name="content" placeholder="Détails de l'annonce..." required></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-sm-9">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="is_important" name="is_important">
+                                        <label class="custom-control-label text-danger font-weight-bold" for="is_important">Marquer comme importante (Urgent)</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-right mt-4">
+                                <a href="{% url 'announcements' %}" class="btn btn-outline-secondary mr-2">Annuler</a>
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-bullhorn mr-2"></i>Publier l'annonce</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

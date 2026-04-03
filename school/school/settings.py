@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'faculty', #app faculty
     'student', #app stident
     'home_auth', #app home_auth
+    'messaging', #app messagerie & annonces
 ]
 
 MIDDLEWARE = [

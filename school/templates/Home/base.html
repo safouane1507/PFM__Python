@@ -62,27 +62,28 @@
                   </div>
                </li>
                <li class="nav-item dropdown has-arrow">
-                  <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                  <span class="user-img"><img class="rounded-circle" src="{%static 'assets/img/profiles/avatar-01.jpg'%}" width="31" alt="Ryan Taylor"></span>
-                  </a>
-                  <div class="dropdown-menu">
-                     <div class="user-header">
-                        <div class="avatar avatar-sm">
-                           <img src="{%static 'assets/img/profiles/avatar-01.jpg'%}" alt="User Image" class="avatar-img rounded-circle">
-                        </div>
-                        <div class="user-text">
-                           {% comment %} <h6>{{user.username}}</h6> {% endcomment %}
-                           <p class="text-muted mb-0">Administrator</p>
-                        </div>
-                     </div>
-                     <!--<a class="dropdown-item" href="profile.html">My Profile</a>
-                     <a class="dropdown-item" href="inbox.html">Inbox</a>
-                     <a class="dropdown-item" href="">Logout</a>
-                     -->
-                     <a class="dropdown-item" href="{% url 'profile' %}">My Profile</a>
-                     <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                  </div>
-               </li>
+                   <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                   <span class="user-img"><img class="rounded-circle" src="{%static 'assets/img/profiles/avatar-01.jpg'%}" width="31" alt="{{ request.user.get_full_name }}"></span>
+                   </a>
+                   <div class="dropdown-menu">
+                      <div class="user-header">
+                         <div class="avatar avatar-sm">
+                            <img src="{%static 'assets/img/profiles/avatar-01.jpg'%}" alt="User Image" class="avatar-img rounded-circle">
+                         </div>
+                         <div class="user-text">
+                            <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+                            <p class="text-muted mb-0">
+                               {% if request.user.is_admin %}Administrateur
+                               {% elif request.user.is_teacher %}Enseignant
+                               {% elif request.user.is_student %}Étudiant
+                               {% else %}Utilisateur{% endif %}
+                            </p>
+                         </div>
+                      </div>
+                      <a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user mr-2"></i>Mon Profil</a>
+                      <a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt mr-2"></i>Déconnexion</a>
+                   </div>
+                </li>
             </ul>
          </div>
          <div class="sidebar" id="sidebar">
@@ -154,12 +155,39 @@
                      </li>
                      {% endif %}
 
+                     <!-- L'ÉTUDIANT PEUT VOIR SES EXAMENS ET SES NOTES (lecture seule) -->
+                     {% if request.user.is_student %}
+                     <li class="submenu">
+                        <a href="#"><i class="fas fa-clipboard-list"></i> <span> Mes Examens </span> <span class="menu-arrow"></span></a>
+                        <ul>
+                           <li><a href="{% url 'exam_list' %}"><i class="fas fa-calendar-alt"></i> Examens planifiés</a></li>
+                           <li><a href="{% url 'result_list' %}"><i class="fas fa-star"></i> Mes Notes</a></li>
+                        </ul>
+                     </li>
+                     {% endif %}
+
                      <!-- TOUT LE MONDE PEUT VOIR ÇA -->
                      <li>
                         <a href="{% url 'holiday_list' %}"><i class="fas fa-holly-berry"></i> <span>Jours Fériés</span></a>
                      </li>
                      <li>
                         <a href="{% url 'timetable' %}"><i class="fas fa-table"></i> <span>Emploi du Temps</span></a>
+                     </li>
+                     
+                     <!-- MESSAGERIE & ANNONCES -->
+                     <li class="menu-title">
+                        <span>Communication</span>
+                     </li>
+                     <li>
+                        <a href="{% url 'announcements' %}"><i class="fas fa-bullhorn"></i> <span>Annonces</span></a>
+                     </li>
+                     <li class="submenu">
+                        <a href="#"><i class="fas fa-envelope"></i> <span> Messagerie </span> <span class="menu-arrow"></span></a>
+                        <ul>
+                           <li><a href="{% url 'inbox' %}"><i class="fas fa-inbox"></i> Boîte de réception</a></li>
+                           <li><a href="{% url 'sent_messages' %}"><i class="fas fa-paper-plane"></i> Messages envoyés</a></li>
+                           <li><a href="{% url 'compose' %}"><i class="fas fa-pen"></i> Nouveau message</a></li>
+                        </ul>
                      </li>
                      
                      <!-- LOGOUT -->
@@ -183,7 +211,8 @@
 
     
       <script src="{% static 'assets/js/jquery-3.6.0.min.js' %}"></script>
-      <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+      <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+      <script src="{% static 'assets/plugins/bootstrap/js/bootstrap.min.js' %}"></script>
       <script src="{% static 'assets/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
       <script src="{% static 'assets/js/script.js' %}"></script>
  
