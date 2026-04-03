@@ -10,7 +10,11 @@
      
  🎬  DEMO VIDEO 
  
-https://github.com/user-attachments/assets/3967b1ad-70b5-40f2-9907-499c37a7f166
+
+
+https://github.com/user-attachments/assets/197bc350-60a8-4de2-9248-1f8807168249
+
+
 
 
 ═══════════════════════════════════════════════════════════════════════
